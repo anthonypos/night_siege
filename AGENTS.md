@@ -112,8 +112,26 @@ lib/
 - Prefer `const` constructors and widgets wherever valid.
 - Avoid `dynamic` and unchecked casts unless required by an external boundary; validate and narrow types quickly.
 - Prefer expression clarity over cleverness. Keep functions and widgets small enough to test and review.
-- Use `///` doc comments for public APIs, reusable components, and non-obvious behavior.
+- Use comments and doc comments deliberately. Follow the dedicated comments/docstrings guidance below.
 - Do not edit generated files directly, including `*.g.dart`, `*.freezed.dart`, `*.gr.dart`, `*.mocks.dart`, generated localization files, or generated plugin registrants. Change the source file and regenerate.
+
+## Comments and docstrings
+
+- Prefer self-explanatory code over comments. Improve names, structure, extracted methods, and types before adding explanatory comments.
+- Use `///` Dart doc comments for public APIs that are intended to be reused or called from outside the immediate file, including public classes, widgets, extensions, enums, methods, functions, typedefs, and public constructor parameters when the usage is not obvious.
+- For reusable Flutter widgets, document the widget's purpose, important constraints, expected inputs, and any non-obvious layout, lifecycle, accessibility, or state-management behavior.
+- For ViewModels/controllers/repositories/services, document public methods when they perform non-trivial side effects, have ordering requirements, depend on external systems, cache data, debounce/throttle work, or intentionally swallow/transform errors.
+- Keep doc comments concise and useful. State what callers need to know: contract, intent, edge cases, side effects, thrown exceptions, null/empty behavior, async timing, cancellation, and ownership/disposal responsibilities.
+- Do not add comments that merely restate the code, such as `// increment counter`, `// create widget`, or `/// The submit button`.
+- Do not add broad file headers, author tags, changelog comments, TODOs, or speculative future notes unless the project already uses them or the user explicitly asks.
+- Use normal `//` implementation comments only for non-obvious decisions, workarounds, platform quirks, performance trade-offs, security/privacy reasoning, or links to external bugs/specs that explain why the code is shaped a certain way.
+- When adding a workaround comment, include the condition that allows it to be removed, such as a package version, Flutter issue, platform limitation, or linked follow-up.
+- Keep comments up to date when changing code. Remove stale comments rather than preserving misleading context.
+- Avoid block comments for routine Dart code. Prefer short `//` comments near the relevant line or `///` doc comments on the declaration.
+- Do not use comments to hide poor structure. If a section needs many comments to be understandable, refactor it into named methods/classes first.
+- Use `// ignore:` and `// ignore_for_file:` only as a last resort. Prefer fixing the lint. When suppression is necessary, keep it as narrow as possible and explain why.
+- Do not document private members by default. Add a private doc/comment only when the behavior is genuinely non-obvious or future maintainers are likely to break an intentional constraint.
+- For tests, prefer behavior-focused test names over comments. Use comments only to clarify complex setup, unusual fakes, timing assumptions, or regression context.
 
 ## UI and widget guidelines
 
