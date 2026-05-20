@@ -25,6 +25,8 @@ Checkpoints:
 - `flutter analyze` and `flutter test` pass.
 - Movement uses `dt`.
 - Diagonal movement is not faster than cardinal movement.
+- Player remains inside the visible arena.
+- Component tests cover Phase 1 movement and bounds behavior.
 - Phase 1: Player movement works while zombies, combat, HUD, safehouse, assets, and map tooling remain out of scope.
 
 Do not spend time on:
@@ -38,7 +40,7 @@ Do not spend time on:
 
 Stretch only if ahead:
 
-- Simple arena bounds.
+- Movement speed tuning after the tested movement baseline feels correct.
 
 ## Day 2 - Safehouse And HUD
 

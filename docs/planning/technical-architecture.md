@@ -87,6 +87,8 @@ import 'package:flame/events.dart';
 
 In Phase 1, the game class should mix in `KeyboardEvents` and pass pressed keys to the player. Later phases may also route game actions such as shooting and placing barricades.
 
+Keep Phase 1 movement deterministic enough to test directly: set the player's pressed keys, call `update(dt)`, and assert the resulting position. The first movement checkpoint should also clamp the player to the visible arena so keyboard exploration cannot move the placeholder off-screen before later map or camera systems exist.
+
 ## Core Game Loop Structure
 
 The game should run as a simple state machine:

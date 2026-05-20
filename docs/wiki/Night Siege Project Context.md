@@ -265,7 +265,8 @@ This system exists to capture the “finding people and building a group” fant
 - Render a visible placeholder player
 - Player movement
 - Keyboard input with `KeyboardEvents`
-- Optional viewport or arena bounds
+- Clamp player to simple viewport or arena bounds
+- Add focused tests for `dt` movement, normalized diagonal movement, stopped movement, and bounds
 - Do not add zombies, combat, HUD, safehouse, assets, or map tooling
 
 ## Phase 2 — Safehouse And HUD
@@ -340,7 +341,7 @@ The emotional fantasy is:
 - [priority] Keep the game playable at every stage and prioritize game feel over technical complexity #delivery
 - [constraint] Avoid overengineering, plugin bloat, large refactors, and premature abstraction during week one #scope
 - [phase] Phase 0 ends at a runnable Flutter and Flame shell with `GameWidget`, `NightSiegeGame`, and a plain rendered scene; it does not include player movement, zombies, HUD, safehouse, assets, or map tooling #delivery
-- [phase] Phase 1 introduces `PlayerComponent`, a visible placeholder player, WASD and arrow-key movement through `KeyboardEvents`, and optional bounds only #player
+- [phase] Phase 1 introduces `PlayerComponent`, a visible placeholder player, WASD and arrow-key movement through `KeyboardEvents`, simple arena bounds, and focused movement tests #player
 - [requirement] MVP requires player movement, safehouse health, zombie spawning and AI, combat, ammo, wood, barricades, damage systems, win/loss conditions, HUD, and restart flow #mvp
 - [stretch] Day/night cycle, loot pickups, repair, traps, small map, sound, screen shake, particles, and one survivor card are nice-to-have features #stretch
 - [non_goal] Week one excludes open world, multiplayer, complex crafting, large inventory, advanced AI, procedural generation, cinematics, fully simulated NPCs, and large content scope #scope

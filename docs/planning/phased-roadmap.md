@@ -76,7 +76,7 @@ Systems introduced:
 
 - `PlayerComponent`.
 - Keyboard input.
-- Optional viewport or arena bounds.
+- Simple viewport or arena bounds.
 
 Technical risks:
 
@@ -97,7 +97,8 @@ Acceptance criteria:
 - WASD and arrow key movement work.
 - `KeyboardEvents` is imported with `import 'package:flame/events.dart';`.
 - Player movement is smooth and testable.
-- The player can optionally be clamped to the viewport or arena bounds.
+- The player is clamped to the viewport or arena bounds.
+- Component tests cover `dt` movement, normalized diagonal movement, stopped movement, and bounds.
 - No zombies, combat, HUD, safehouse, assets, or map tooling exists yet.
 
 Estimated complexity:
@@ -111,7 +112,8 @@ Suggested implementation order:
 3. Add `KeyboardEvents` to `NightSiegeGame`.
 4. Track pressed keys.
 5. Move the player using normalized direction and `dt`.
-6. Add simple arena or viewport bounds only if needed.
+6. Add simple arena or viewport bounds.
+7. Add focused movement and bounds tests.
 
 ## Phase 2 - Safehouse And HUD
 

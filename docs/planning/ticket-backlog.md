@@ -144,6 +144,7 @@ Acceptance criteria:
 - Movement uses `dt`.
 - Movement is smooth and testable.
 - `KeyboardEvents` is imported with `import 'package:flame/events.dart';`.
+- Component tests cover cardinal movement, normalized diagonal movement, and stopped movement.
 - No zombies, combat, HUD, safehouse, assets, or map tooling exists yet.
 
 Suggested files/classes:
@@ -163,16 +164,17 @@ Priority:
 
 - Must-have.
 
-### P1-03 - Optional Arena Bounds
+### P1-03 - Simple Arena Bounds
 
 Description:
 
-- Optionally prevent the player from leaving the visible viewport or configured arena.
+- Prevent the player from leaving the visible viewport or configured arena.
 
 Acceptance criteria:
 
 - Player remains inside the visible or configured arena.
 - Bounds behavior feels predictable.
+- Component tests cover clamping at the arena edges.
 
 Suggested files/classes:
 
@@ -189,7 +191,37 @@ Estimated effort:
 
 Priority:
 
-- Should-have.
+- Must-have.
+
+### P1-04 - Movement Test Coverage
+
+Description:
+
+- Add focused tests for the movement rules introduced in Phase 1.
+
+Acceptance criteria:
+
+- Tests assert cardinal movement uses `speed * dt`.
+- Tests assert diagonal movement is not faster than cardinal movement.
+- Tests assert the player does not drift when no movement keys are pressed.
+- Tests assert bounds prevent the player from leaving the arena.
+- `flutter test` passes.
+
+Suggested files/classes:
+
+- `test/game/components/player_component_test.dart`
+
+Dependencies:
+
+- P1-03.
+
+Estimated effort:
+
+- Small.
+
+Priority:
+
+- Must-have.
 
 ## Phase 2 - Safehouse And HUD
 

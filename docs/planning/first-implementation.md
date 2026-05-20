@@ -95,6 +95,10 @@ lib/
   game/
     components/
       player_component.dart
+test/
+  game/
+    components/
+      player_component_test.dart
 ```
 
 ## Phase 1 `lib/game/night_siege_game.dart`
@@ -115,7 +119,7 @@ class NightSiegeGame extends FlameGame with KeyboardEvents {
 
   @override
   Future<void> onLoad() async {
-    player = PlayerComponent()
+    player = PlayerComponent(arenaSize: size)
       ..position = size / 2;
     add(player);
   }
@@ -139,13 +143,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class PlayerComponent extends RectangleComponent {
-  PlayerComponent()
-      : super(
+  PlayerComponent({required Vector2 arenaSize})
+      : _arenaSize = arenaSize.clone(),
+        super(
           size: Vector2.all(28),
           anchor: Anchor.center,
           paint: Paint()..color = const Color(0xFFE8E2C8),
         );
 
+  final Vector2 _arenaSize;
   Set<LogicalKeyboardKey> keysPressed = {};
 
   static const double speed = 180;
@@ -176,9 +182,25 @@ class PlayerComponent extends RectangleComponent {
     if (direction.length2 > 0) {
       position += direction.normalized() * speed * dt;
     }
+
+    _clampToArena();
+  }
+
+  void _clampToArena() {
+    final halfSize = size / 2;
+    position.clamp(halfSize, _arenaSize - halfSize);
   }
 }
 ```
+
+## Phase 1 Tests
+
+Add focused component tests for movement behavior rather than relying only on the widget smoke test:
+
+- Setting a cardinal key and calling `update(dt)` moves the player by `speed * dt`.
+- Setting a diagonal key pair does not move the player farther than cardinal movement for the same `dt`.
+- Movement stops when no movement keys are pressed.
+- The player remains clamped inside the visible arena after update.
 
 ## First Playable Checkpoint
 
@@ -189,8 +211,8 @@ The first checkpoint is intentionally small:
 - Player placeholder appears.
 - WASD and arrow keys move the player.
 - Movement feels responsive.
-- Movement is simple enough to test by direct key state and `dt`.
-- The player is optionally clamped to the viewport or arena bounds.
+- Movement is covered by direct key-state and `dt` tests.
+- The player is clamped to the visible viewport or arena bounds.
 
 Do not continue to safehouse, zombies, combat, HUD, resources, assets, or map tooling until this checkpoint is true.
 
@@ -198,7 +220,7 @@ Do not continue to safehouse, zombies, combat, HUD, resources, assets, or map to
 
 After movement works:
 
-1. Clamp the player inside the visible arena.
-2. Tune movement speed.
+1. Tune movement speed.
+2. Re-check keyboard feel in a launched desktop build.
 
 Avoid camera systems, animation, sprites, mobile controls, map tooling, assets, or extra architecture at this stage.
