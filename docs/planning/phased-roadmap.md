@@ -133,18 +133,34 @@ Systems introduced:
 
 - `SafehouseComponent`.
 - Safehouse health.
+- Starter ammo and wood counters.
+- Simple phase or wave label.
 - Basic HUD overlay.
-- Restart-ready game state.
+- Restart baseline for current run state.
 
 Technical risks:
 
 - HUD not updating cleanly.
 - Game state becoming scattered across components.
+- Adding a full phase model before it is needed.
 
 Scope risks:
 
 - Overdesigning UI.
 - Adding a menu system before the run loop works.
+- Building a full game-over flow before zombies can damage the safehouse.
+
+Acceptance criteria:
+
+- Phase 1 movement, arena bounds, and component tests are complete.
+- `SafehouseComponent` exists and renders clearly.
+- Safehouse tracks current and max health.
+- Game stores starter ammo and wood counters as simple integer state.
+- HUD displays safehouse health, ammo, wood, and a simple phase or wave label.
+- The phase or wave label does not require the full `GamePhase` enum yet.
+- `restartRun()` resets the player position, safehouse health, starter resources, and phase or wave label.
+- No zombies, combat, barricades, loot, day/night timer, game-over overlay, victory overlay, assets, or map tooling exists yet.
+- `flutter analyze` and `flutter test` pass.
 
 Estimated complexity:
 
@@ -154,11 +170,68 @@ Suggested implementation order:
 
 1. Add safehouse component.
 2. Give safehouse max health and current health.
-3. Show safehouse health in HUD.
-4. Add resources counters with starting ammo and wood.
-5. Add restart method, even before game over is fully implemented.
+3. Add starter resource counters with starting ammo and wood.
+4. Show safehouse health, ammo, wood, and a simple phase or wave label in HUD.
+5. Add `restartRun()` for current Phase 2 state, before full game over is implemented.
 
-## Phase 3 - Zombies And Combat
+## Phase 3 - Isometric 2.5D Refactor
+
+Objective:
+
+- Pivot the playable foundation from flat top-down rendering to an isometric fake-3D presentation.
+
+Why it matters:
+
+- The safehouse, barricades, zombies, and scavenging spaces will read better when objects have footprint, height, and depth ordering before combat complexity arrives.
+
+User experience goal:
+
+- The game still plays like a simple 2D Flame game, but the arena looks like an isometric survival space with clear object depth.
+
+Systems introduced:
+
+- World-to-screen projection helper.
+- Isometric placeholder rendering for the player and safehouse.
+- Depth sorting for world objects.
+- World-space movement and bounds preserved behind the presentation layer.
+
+Technical risks:
+
+- Coupling gameplay rules to screen-space coordinates.
+- Breaking Phase 1 movement tests while changing the view.
+- Depth sorting bugs causing the player, safehouse, or future zombies to draw in the wrong order.
+
+Scope risks:
+
+- Adding true 3D, a 3D engine, or a new rendering package.
+- Starting an asset pipeline before the fake-3D geometry proves readable.
+- Rebuilding movement, collision, or camera systems beyond what the perspective change requires.
+
+Acceptance criteria:
+
+- Player and safehouse still use deterministic 2D world positions for movement and state.
+- Rendering uses an isometric or fake-3D projection.
+- Player and safehouse placeholders have readable footprint and height.
+- Components render in depth order based on world position.
+- HUD from Phase 2 remains a Flutter overlay and still displays safehouse health, ammo, wood, and phase label.
+- `restartRun()` still resets the same Phase 2 state.
+- Phase 1 movement tests and Phase 2 state/HUD tests continue to pass.
+- No zombies, combat, barricades, loot, day/night timer, game-over overlay, victory overlay, assets, map tooling, or new packages are added in this phase.
+
+Estimated complexity:
+
+- Medium.
+
+Suggested implementation order:
+
+1. Add a small projection helper for world-to-screen and screen-to-world where needed.
+2. Keep player movement in world coordinates.
+3. Convert player and safehouse placement to explicit world positions.
+4. Update player and safehouse placeholder rendering for isometric fake height.
+5. Add depth sorting for spatial components.
+6. Update tests to assert gameplay state remains world-space and deterministic.
+
+## Phase 4 - Zombies And Combat
 
 Objective:
 
@@ -179,6 +252,7 @@ Systems introduced:
 - `BulletComponent`.
 - Ammo spending.
 - Damage and death handling.
+- Failure state once safehouse health reaches zero.
 
 Technical risks:
 
@@ -205,8 +279,9 @@ Suggested implementation order:
 5. Add bullet-zombie collision.
 6. Remove dead zombies and expired bullets.
 7. Add zombie damage to safehouse.
+8. Trigger a restartable failure state when safehouse health reaches zero.
 
-## Phase 4 - Barricades And Base Defense
+## Phase 5 - Barricades And Base Defense
 
 Objective:
 
@@ -254,7 +329,7 @@ Suggested implementation order:
 6. Remove destroyed barricades.
 7. Tune barricade health and zombie damage.
 
-## Phase 5 - Day/Night And Scavenging
+## Phase 6 - Day/Night And Scavenging
 
 Objective:
 
@@ -302,7 +377,7 @@ Suggested implementation order:
 6. Advance night count at dawn.
 7. Add victory after a fixed number of nights.
 
-## Phase 6 - Atmosphere And Polish
+## Phase 7 - Atmosphere And Polish
 
 Objective:
 
@@ -347,7 +422,7 @@ Suggested implementation order:
 4. Add minimal shoot/hit/damage sounds.
 5. Add game over/victory polish.
 
-## Phase 7 - Stretch Goals
+## Phase 8 - Stretch Goals
 
 Objective:
 

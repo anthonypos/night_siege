@@ -1,6 +1,6 @@
 # Product Vision
 
-Night Siege is a small 2D top-down zombie survival/base-defense game built with Flutter and Flame. The player scavenges during the day, returns to a fragile safehouse, spends scarce resources on defenses, and tries to survive escalating zombie attacks at night. This is a one-week vertical slice, so the goal is a focused playable prototype rather than a broad content-complete game.
+Night Siege is a small isometric 2.5D zombie survival/base-defense game built with Flutter and Flame. The player scavenges during the day, returns to a fragile safehouse, spends scarce resources on defenses, and tries to survive escalating zombie attacks at night. This is a one-week vertical slice, so the goal is a focused playable prototype rather than a broad content-complete game.
 
 ## Target Experience
 
@@ -28,6 +28,7 @@ Tension should come from simple, readable pressure:
 The survival fantasy requires only a small set of systems:
 
 - Player movement and basic combat.
+- Isometric fake-3D presentation with simple 2D world-space rules.
 - A safehouse with health.
 - Zombies that move toward the player or safehouse.
 - Ammo as a limited combat resource.
@@ -55,6 +56,7 @@ Do not build these in week one:
 - Large content scope.
 - Multiple polished biomes or maps.
 - Large art or animation pipelines.
+- True 3D or camera tooling before the core loop works.
 
 ## Product Principles
 

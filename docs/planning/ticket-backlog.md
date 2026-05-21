@@ -225,6 +225,8 @@ Priority:
 
 ## Phase 2 - Safehouse And HUD
 
+Phase 2 starts only after Phase 1 is fully complete, including movement tests and arena bounds. This phase adds the objective, starter HUD state, and a reset baseline. It does not add zombies, combat, barricades, loot, a day/night timer, or full win/loss overlays.
+
 ### P2-01 - Safehouse Component
 
 Description:
@@ -242,7 +244,7 @@ Suggested files/classes:
 
 Dependencies:
 
-- P1-02.
+- P1-04.
 
 Estimated effort:
 
@@ -252,20 +254,23 @@ Priority:
 
 - Must-have.
 
-### P2-02 - Basic HUD Overlay
+### P2-02 - Basic HUD Overlay And Starter Resources
 
 Description:
 
-- Show survival-critical information.
+- Show survival-critical information and add the starter counters future systems will spend.
 
 Acceptance criteria:
 
 - HUD displays safehouse health.
+- Game tracks starter ammo and wood as integer counters.
 - HUD displays ammo and wood.
-- HUD displays current phase or wave state.
+- HUD displays a simple phase or wave label, such as `Prepare`.
+- The simple phase or wave label does not require the full `GamePhase` enum.
 
 Suggested files/classes:
 
+- `lib/game/models/resources.dart`
 - `lib/game/ui/hud_overlay.dart`
 - `NightSiegeGame`
 
@@ -281,110 +286,20 @@ Priority:
 
 - Must-have.
 
-### P2-03 - Game Over And Restart
+### P2-03 - Restart Baseline
 
 Description:
 
-- Add a restartable failure state.
+- Add a restart method for the current Phase 2 run state.
 
 Acceptance criteria:
 
-- Safehouse reaching zero health triggers game over.
-- Restart resets player, safehouse, resources, zombies, barricades, and phase.
+- `restartRun()` resets the player position, safehouse health, starter resources, and phase or wave label.
+- Restart logic does not reference zombies, barricades, bullets, loot, or other future systems before they exist.
+- No game-over overlay is required in Phase 2.
 
 Suggested files/classes:
 
-- `lib/game/ui/game_over_overlay.dart`
-- `NightSiegeGame`
-
-Dependencies:
-
-- P2-01.
-
-Estimated effort:
-
-- Medium.
-
-Priority:
-
-- Must-have.
-
-## Phase 3 - Zombies And Combat
-
-### P3-01 - Zombie Component
-
-Description:
-
-- Add a zombie that moves toward a target.
-
-Acceptance criteria:
-
-- Zombie renders as placeholder geometry.
-- Zombie moves toward the safehouse or player.
-- Zombie has health.
-
-Suggested files/classes:
-
-- `lib/game/components/zombie_component.dart`
-
-Dependencies:
-
-- P2-01.
-
-Estimated effort:
-
-- Medium.
-
-Priority:
-
-- Must-have.
-
-### P3-02 - Zombie Spawner
-
-Description:
-
-- Spawn zombies from the edge of the arena.
-
-Acceptance criteria:
-
-- Zombies spawn over time.
-- Spawn rate is tunable with simple constants.
-- Spawner can be disabled outside the attack phase.
-
-Suggested files/classes:
-
-- `lib/game/systems/zombie_spawner.dart`
-- `NightSiegeGame`
-
-Dependencies:
-
-- P3-01.
-
-Estimated effort:
-
-- Medium.
-
-Priority:
-
-- Must-have.
-
-### P3-03 - Shooting And Ammo
-
-Description:
-
-- Let the player shoot a simple projectile.
-
-Acceptance criteria:
-
-- Shooting consumes one ammo.
-- Shooting has a cooldown.
-- No shot fires when ammo is zero.
-- Bullet travels in a readable direction.
-
-Suggested files/classes:
-
-- `lib/game/components/bullet_component.dart`
-- `PlayerComponent`
 - `NightSiegeGame`
 
 Dependencies:
@@ -399,7 +314,194 @@ Priority:
 
 - Must-have.
 
-### P3-04 - Damage And Death
+## Phase 3 - Isometric 2.5D Refactor
+
+Phase 3 pivots the presentation from flat top-down to isometric fake 3D before zombies and combat are added. Keep gameplay state in 2D world coordinates and treat the isometric view as a rendering/projection layer.
+
+### P3-01 - Isometric Projection Helper
+
+Description:
+
+- Add a small helper that converts 2D world coordinates into isometric screen coordinates.
+
+Acceptance criteria:
+
+- Projection math is isolated from gameplay rules.
+- World positions remain normal 2D vectors for movement, bounds, and future collision.
+- Projection is deterministic and covered by focused tests.
+- No new packages or true 3D engine are introduced.
+
+Suggested files/classes:
+
+- `lib/game/geometry/isometric_projection.dart`
+- `test/game/geometry/isometric_projection_test.dart`
+
+Dependencies:
+
+- P2-03.
+
+Estimated effort:
+
+- Small.
+
+Priority:
+
+- Must-have.
+
+### P3-02 - World-Space Player And Safehouse Placement
+
+Description:
+
+- Convert player and safehouse placement to explicit world-space positions that are rendered through the isometric projection.
+
+Acceptance criteria:
+
+- Player movement still uses `dt`, normalized diagonal movement, and arena bounds.
+- Safehouse keeps current and max health from Phase 2.
+- `restartRun()` resets player world position, safehouse health, starter resources, and phase label.
+- Existing Phase 1 and Phase 2 tests are updated without weakening behavior coverage.
+
+Suggested files/classes:
+
+- `NightSiegeGame`
+- `PlayerComponent`
+- `SafehouseComponent`
+
+Dependencies:
+
+- P3-01.
+
+Estimated effort:
+
+- Medium.
+
+Priority:
+
+- Must-have.
+
+### P3-03 - Isometric Placeholder Rendering And Depth Sorting
+
+Description:
+
+- Render the player and safehouse with simple fake-height geometry and draw world objects in depth order.
+
+Acceptance criteria:
+
+- Player and safehouse placeholders have readable footprint and height.
+- Components behind other components render first based on world position.
+- HUD remains a Flutter overlay and is not projected into world space.
+- Rendering stays geometric; no assets, map tooling, or new packages are added.
+
+Suggested files/classes:
+
+- `NightSiegeGame`
+- `PlayerComponent`
+- `SafehouseComponent`
+
+Dependencies:
+
+- P3-02.
+
+Estimated effort:
+
+- Medium.
+
+Priority:
+
+- Must-have.
+
+## Phase 4 - Zombies And Combat
+
+### P4-01 - Zombie Component
+
+Description:
+
+- Add a zombie that moves toward a target.
+
+Acceptance criteria:
+
+- Zombie renders as isometric placeholder geometry.
+- Zombie moves toward the safehouse or player in world space.
+- Zombie has health.
+
+Suggested files/classes:
+
+- `lib/game/components/zombie_component.dart`
+
+Dependencies:
+
+- P3-03.
+
+Estimated effort:
+
+- Medium.
+
+Priority:
+
+- Must-have.
+
+### P4-02 - Zombie Spawner
+
+Description:
+
+- Spawn zombies from the edge of the arena.
+
+Acceptance criteria:
+
+- Zombies spawn over time.
+- Spawn positions use world-space arena edges.
+- Spawn rate is tunable with simple constants.
+- Spawner can be disabled outside the attack phase.
+
+Suggested files/classes:
+
+- `lib/game/systems/zombie_spawner.dart`
+- `NightSiegeGame`
+
+Dependencies:
+
+- P4-01.
+
+Estimated effort:
+
+- Medium.
+
+Priority:
+
+- Must-have.
+
+### P4-03 - Shooting And Ammo
+
+Description:
+
+- Let the player shoot a simple projectile.
+
+Acceptance criteria:
+
+- Shooting consumes one ammo.
+- Shooting has a cooldown.
+- No shot fires when ammo is zero.
+- Bullet travels in a readable world-space direction and renders clearly in the isometric view.
+
+Suggested files/classes:
+
+- `lib/game/components/bullet_component.dart`
+- `PlayerComponent`
+- `NightSiegeGame`
+
+Dependencies:
+
+- P2-02, P3-03.
+
+Estimated effort:
+
+- Medium.
+
+Priority:
+
+- Must-have.
+
+### P4-04 - Damage And Death
 
 Description:
 
@@ -421,7 +523,7 @@ Suggested files/classes:
 
 Dependencies:
 
-- P3-01, P3-03.
+- P4-01, P4-03.
 
 Estimated effort:
 
@@ -431,23 +533,54 @@ Priority:
 
 - Must-have.
 
-## Phase 4 - Barricades And Base Defense
-
-### P4-01 - Wood Resource
+### P4-05 - Failure State And Restart From Loss
 
 Description:
 
-- Track wood as the defense-building resource.
+- Trigger a restartable failure state once zombies can damage the safehouse.
 
 Acceptance criteria:
 
-- Wood starts at a useful test value.
-- HUD displays wood.
-- Game exposes a simple spend method.
+- Safehouse reaching zero health triggers game over.
+- Game over stops zombie spawning, shooting, and damage updates.
+- Restart resets player, safehouse, resources, zombies, bullets, and the current attack or wave state.
+- Restart does not reference barricades or loot before those systems exist.
 
 Suggested files/classes:
 
-- `lib/game/models/resources.dart`
+- `lib/game/ui/game_over_overlay.dart`
+- `NightSiegeGame`
+- `SafehouseComponent`
+
+Dependencies:
+
+- P4-04.
+
+Estimated effort:
+
+- Medium.
+
+Priority:
+
+- Must-have.
+
+## Phase 5 - Barricades And Base Defense
+
+### P5-01 - Wood Spending
+
+Description:
+
+- Turn the existing wood counter into a spendable defense-building resource.
+
+Acceptance criteria:
+
+- Wood still starts at a useful test value.
+- HUD displays updated wood after spending.
+- Game exposes a simple `spendWood(amount)` method.
+- Spending fails without changing wood when wood is insufficient.
+
+Suggested files/classes:
+
 - `NightSiegeGame`
 - `HudOverlay`
 
@@ -463,7 +596,7 @@ Priority:
 
 - Must-have.
 
-### P4-02 - Barricade Placement
+### P5-02 - Barricade Placement
 
 Description:
 
@@ -472,8 +605,9 @@ Description:
 Acceptance criteria:
 
 - Barricade placement costs wood.
+- Placement uses world-space coordinates.
 - Placement fails when wood is insufficient.
-- Barricade renders clearly.
+- Barricade renders clearly in the isometric view.
 
 Suggested files/classes:
 
@@ -483,7 +617,7 @@ Suggested files/classes:
 
 Dependencies:
 
-- P4-01.
+- P5-01, P3-03.
 
 Estimated effort:
 
@@ -493,7 +627,7 @@ Priority:
 
 - Must-have.
 
-### P4-03 - Barricade Damage
+### P5-03 - Barricade Damage
 
 Description:
 
@@ -512,7 +646,7 @@ Suggested files/classes:
 
 Dependencies:
 
-- P4-02, P3-04.
+- P5-02, P4-04.
 
 Estimated effort:
 
@@ -522,9 +656,9 @@ Priority:
 
 - Must-have.
 
-## Phase 5 - Day/Night And Scavenging
+## Phase 6 - Day/Night And Scavenging
 
-### P5-01 - Game Phase Model
+### P6-01 - Game Phase Model
 
 Description:
 
@@ -532,8 +666,8 @@ Description:
 
 Acceptance criteria:
 
-- Game knows current phase.
-- HUD displays current phase.
+- Game replaces or extends the Phase 2 phase/wave label with `GamePhase`.
+- HUD displays current phase from `GamePhase`.
 - Code can branch on phase.
 
 Suggested files/classes:
@@ -553,7 +687,7 @@ Priority:
 
 - Must-have.
 
-### P5-02 - Phase Timer
+### P6-02 - Phase Timer
 
 Description:
 
@@ -573,7 +707,7 @@ Suggested files/classes:
 
 Dependencies:
 
-- P5-01.
+- P6-01.
 
 Estimated effort:
 
@@ -583,7 +717,7 @@ Priority:
 
 - Should-have.
 
-### P5-03 - Loot Pickups
+### P6-03 - Loot Pickups
 
 Description:
 
@@ -592,6 +726,7 @@ Description:
 Acceptance criteria:
 
 - Loot spawns during day.
+- Loot uses world-space positions and renders clearly in the isometric view.
 - Player collision collects loot.
 - Ammo and wood counters update.
 
@@ -601,7 +736,7 @@ Suggested files/classes:
 
 Dependencies:
 
-- P5-01, P4-01.
+- P6-01, P5-01.
 
 Estimated effort:
 
@@ -611,7 +746,7 @@ Priority:
 
 - Should-have.
 
-### P5-04 - Night Escalation
+### P6-04 - Night Escalation
 
 Description:
 
@@ -630,7 +765,7 @@ Suggested files/classes:
 
 Dependencies:
 
-- P3-02, P5-02.
+- P4-02, P6-02.
 
 Estimated effort:
 
@@ -640,7 +775,7 @@ Priority:
 
 - Must-have.
 
-### P5-05 - Victory Condition
+### P6-05 - Victory Condition
 
 Description:
 
@@ -659,7 +794,7 @@ Suggested files/classes:
 
 Dependencies:
 
-- P5-02.
+- P6-02.
 
 Estimated effort:
 
@@ -669,9 +804,9 @@ Priority:
 
 - Must-have.
 
-## Phase 6 - Atmosphere And Polish
+## Phase 7 - Atmosphere And Polish
 
-### P6-01 - Combat Feedback
+### P7-01 - Combat Feedback
 
 Description:
 
@@ -699,7 +834,7 @@ Priority:
 
 - Should-have.
 
-### P6-02 - Phase Atmosphere
+### P7-02 - Phase Atmosphere
 
 Description:
 
@@ -718,7 +853,7 @@ Suggested files/classes:
 
 Dependencies:
 
-- P5-01.
+- P6-01.
 
 Estimated effort:
 
@@ -728,7 +863,7 @@ Priority:
 
 - Should-have.
 
-### P6-03 - Basic Sound Effects
+### P7-03 - Basic Sound Effects
 
 Description:
 
@@ -757,9 +892,9 @@ Priority:
 
 - Could-have.
 
-## Phase 7 - Stretch Goals
+## Phase 8 - Stretch Goals
 
-### P7-01 - Barricade Repair
+### P8-01 - Barricade Repair
 
 Description:
 
@@ -778,7 +913,7 @@ Suggested files/classes:
 
 Dependencies:
 
-- P4-03.
+- P5-03.
 
 Estimated effort:
 
@@ -788,7 +923,7 @@ Priority:
 
 - Could-have.
 
-### P7-02 - Spike Trap
+### P8-02 - Spike Trap
 
 Description:
 
@@ -806,7 +941,7 @@ Suggested files/classes:
 
 Dependencies:
 
-- P4-02.
+- P5-02.
 
 Estimated effort:
 
@@ -816,7 +951,7 @@ Priority:
 
 - Could-have.
 
-### P7-03 - One Survivor Card
+### P8-03 - One Survivor Card
 
 Description:
 

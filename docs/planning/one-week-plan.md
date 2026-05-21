@@ -52,14 +52,16 @@ Deliverables:
 
 - Safehouse component.
 - Safehouse health.
-- HUD with safehouse health, ammo, wood, and phase/wave label.
-- Restart method stub or basic restart.
+- Starter ammo and wood counters.
+- HUD with safehouse health, ammo, wood, and a simple phase/wave label.
+- Restart baseline for the current Phase 2 state.
 
 Checkpoints:
 
 - Safehouse is visually obvious.
 - HUD values are readable.
-- Restart can reset the run state during development.
+- Restart resets player position, safehouse health, starter resources, and the phase/wave label.
+- No zombies, combat, barricades, loot, day/night timer, or full game-over flow exists yet.
 
 Do not spend time on:
 
@@ -69,9 +71,42 @@ Do not spend time on:
 
 Stretch only if ahead:
 
-- Game over overlay.
+- A game-over overlay shell only if it does not add real failure behavior before zombies exist.
 
-## Day 3 - Zombies And Shooting
+## Day 3 - Isometric 2.5D Refactor
+
+Main goal:
+
+- Pivot the presentation before combat systems depend on flat top-down assumptions.
+
+Deliverables:
+
+- Isometric projection helper.
+- Player and safehouse use explicit world-space positions.
+- Player and safehouse render as readable fake-height placeholders.
+- Depth sorting for spatial components.
+- Movement, safehouse state, HUD, and restart tests still pass.
+
+Checkpoints:
+
+- The game still plays with the same WASD and arrow-key movement behavior.
+- The HUD remains a Flutter overlay.
+- The safehouse and player read as objects with footprint and height.
+- No zombies, combat, barricades, loot, day/night timer, assets, or new packages are added yet.
+
+Do not spend time on:
+
+- True 3D.
+- New rendering packages.
+- Asset production.
+- Camera complexity.
+- Tile maps.
+
+Stretch only if ahead:
+
+- Slight projection tuning for readability after the tests are stable.
+
+## Day 4 - Zombies And Shooting
 
 Main goal:
 
@@ -85,13 +120,14 @@ Deliverables:
 - Shooting with ammo.
 - Bullets damage and kill zombies.
 - Zombies damage safehouse.
+- Safehouse reaching zero health triggers a restartable failure state.
 
 Checkpoints:
 
 - A 60-second test is playable.
 - Zombies are readable.
 - Player can run out of ammo.
-- Safehouse can be destroyed.
+- Safehouse can be destroyed and the run can restart from failure.
 
 Do not spend time on:
 
@@ -103,7 +139,7 @@ Stretch only if ahead:
 
 - Hit flash.
 
-## Day 4 - Barricades
+## Day 5 - Barricades
 
 Main goal:
 
@@ -133,11 +169,11 @@ Stretch only if ahead:
 
 - Simple repair interaction.
 
-## Day 5 - Day/Night And Scavenging
+## Day 6 - Day/Night, Scavenging, And Outcomes
 
 Main goal:
 
-- Complete the core loop.
+- Complete the core loop and make the run end cleanly.
 
 Deliverables:
 
@@ -147,52 +183,31 @@ Deliverables:
 - Ammo and wood loot pickups.
 - Night escalation.
 - Dawn transition.
+- Configured number of nights.
+- Victory condition.
+- Game over condition.
+- Restart from both outcomes.
 
 Checkpoints:
 
 - Player can prepare before an attack.
 - The night feels more dangerous than the day.
 - A second night starts cleanly.
+- The game can be won.
+- The game can be lost.
+- Restart works from loss and victory.
 
 Do not spend time on:
 
 - Large exploration map.
 - Food.
 - Complex loot tables.
-
-Stretch only if ahead:
-
-- Simple day/night tint.
-
-## Day 6 - Balance And Win/Loss
-
-Main goal:
-
-- Make the run complete and tense.
-
-Deliverables:
-
-- Configured number of nights.
-- Victory condition.
-- Game over condition.
-- Restart from both outcomes.
-- Tuned spawn rates, ammo, wood, barricade health, and safehouse health.
-
-Checkpoints:
-
-- The game can be won.
-- The game can be lost.
-- The player usually survives night one and struggles later.
-
-Do not spend time on:
-
-- New major mechanics.
 - New content categories.
 - Complex UI.
 
 Stretch only if ahead:
 
-- Screen shake or sound effects.
+- Simple day/night tint.
 
 ## Day 7 - Polish And Stabilization
 
@@ -207,9 +222,11 @@ Deliverables:
 - Final balancing pass.
 - Bug fixes.
 - Playable packaged build or reliable run command.
+- Tuned spawn rates, ammo, wood, barricade health, and safehouse health.
 
 Checkpoints:
 
+- The player usually survives night one and struggles later.
 - A fresh player can understand the loop.
 - A full run takes a reasonable amount of time.
 - No normal-run crashes.

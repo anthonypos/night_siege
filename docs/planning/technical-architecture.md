@@ -35,6 +35,8 @@ lib/
       barricade_component.dart
       bullet_component.dart
       loot_pickup_component.dart
+    geometry/
+      isometric_projection.dart
     systems/
       zombie_spawner.dart
       day_night_controller.dart
@@ -75,6 +77,41 @@ Use plain Dart system classes only when a behavior is clearly not a visual compo
 
 Avoid adding a service locator, dependency injection framework, or state management package for week one.
 
+## Perspective And World Coordinates
+
+Night Siege should pivot to an isometric 2.5D presentation in Phase 3 while keeping gameplay rules simple and testable.
+
+Use 2D world coordinates for gameplay:
+
+- Movement.
+- Bounds.
+- Targeting.
+- Collision checks.
+- Spawn positions.
+- Placement positions.
+
+Use an isolated projection helper to convert world coordinates into isometric screen coordinates for rendering. Do not make gameplay systems reason directly about projected screen coordinates.
+
+Recommended projection shape:
+
+```text
+screenX = (worldX - worldY) * tileWidth / 2
+screenY = (worldX + worldY) * tileHeight / 2 - heightOffset
+```
+
+The exact constants can be tuned, but they should live in one small helper rather than being scattered across components.
+
+Fake height should be represented as rendering geometry, not physics. A safehouse can have a footprint and wall height, while collisions and health still use simple 2D world-space values.
+
+Depth sorting should draw lower/farther world objects first and higher/nearer objects later, typically using a sort key based on `worldPosition.y`, `worldPosition.x + worldPosition.y`, or another consistent world-depth value. Add this before zombies so every future component inherits the same visual rule.
+
+Avoid:
+
+- True 3D engines.
+- New rendering packages.
+- Asset pipelines before geometric placeholders are readable.
+- Coupling the HUD to world projection.
+
 ## Input
 
 Use Flame keyboard events starting in Phase 1, when player movement is introduced.
@@ -114,7 +151,7 @@ Recommended phase responsibilities:
 
 ## State And Data Flow
 
-Keep state centralized in `NightSiegeGame`:
+Keep state centralized in `NightSiegeGame` as systems are introduced:
 
 - `GamePhase phase`
 - `int nightNumber`
@@ -134,6 +171,8 @@ Components should ask the game to perform meaningful state changes:
 
 This keeps gameplay rules visible and avoids hidden side effects.
 
+Phase 2 can use a simple phase or wave label for HUD text before the day/night model exists. Phase 3 should keep that state intact while changing the world presentation. Add `GamePhase` when Phase 6 needs branchable phases and timer-driven transitions. `Resources` may be introduced in Phase 2 as starter ammo and wood counters; Phase 5 turns wood into a spendable defense-building resource.
+
 ## HUD And Screens
 
 Use Flutter overlays through `GameWidget.overlayBuilderMap`.
@@ -146,16 +185,23 @@ Week-one overlays:
 
 Do not build a complex app router for week one.
 
+In Phase 2, `HudOverlay` should show safehouse health, starter ammo, starter wood, and a simple phase or wave label. Add `GameOverOverlay` after a real loss condition exists, starting with zombies damaging the safehouse.
+
 ## Asset Strategy
 
-Start with geometric rendering:
+Start with geometric rendering in the current perspective:
 
-- Player: small light rectangle or circle.
-- Safehouse: larger muted rectangle.
-- Zombies: dark green or red circles.
-- Barricades: brown rectangles.
-- Bullets: small bright circles.
-- Loot: small colored squares.
+- Phase 1 and Phase 2: simple flat placeholders are acceptable.
+- Phase 3 onward: use isometric fake-height placeholders.
+
+Suggested Phase 3 placeholder language:
+
+- Player: small upright marker with a diamond footprint.
+- Safehouse: larger footprint with simple walls and roof height.
+- Zombies: compact upright markers with clear hostile color.
+- Barricades: low raised blocks on the isometric ground plane.
+- Bullets: small bright marks projected through world space.
+- Loot: small raised pickups with distinct ammo and wood colors.
 
 Add image and audio assets only after the loop is playable.
 
@@ -167,7 +213,7 @@ When assets are added:
 
 ## Suggested Enums And Models
 
-Add these only when needed:
+Add these only when needed. `Resources` can appear with the Phase 2 HUD because ammo and wood are already visible there. `GamePhase` should wait until Phase 6 unless an earlier implementation genuinely needs branchable phase state.
 
 ```dart
 enum GamePhase {
@@ -211,7 +257,7 @@ Keep these simple for week one:
 - Resources: integer counters.
 - Barricades: fixed cost and fixed health.
 - Loot: ammo and wood only.
-- Map: one bounded arena.
+- Map: one bounded isometric arena.
 - Difficulty: spawn rate and zombie count scaling.
 
 ## Systems That Can Scale Later

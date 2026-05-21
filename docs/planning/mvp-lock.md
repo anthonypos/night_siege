@@ -9,6 +9,7 @@ If the answer is yes, the vertical slice is succeeding. If the answer is no, do 
 The exact minimum feature set is:
 
 - Player movement.
+- Isometric 2.5D presentation using simple world-space projection.
 - Safehouse with health.
 - Zombies that spawn and move toward the player or safehouse.
 - Basic shooting.
@@ -96,6 +97,7 @@ Avoid these common indie game traps:
 - Building menus instead of restart flow.
 - Turning survivors into NPCs.
 - Treating architecture as a product feature.
+- Letting the isometric pivot turn into true 3D, camera tooling, or an asset pipeline before the loop works.
 
 ## MVP Readiness Checklist
 
@@ -103,6 +105,7 @@ The MVP can be considered locked when:
 
 - A complete run can be played from start to win or loss.
 - The player can restart without relaunching.
+- The isometric view is readable enough to understand player, safehouse, zombies, and barricades.
 - Resource scarcity changes player behavior.
 - Barricades noticeably improve survival odds.
 - Zombies create pressure on the safehouse.

@@ -5,7 +5,7 @@ permalink: night-siege/wiki/night-siege-project-context
 status: active
 date_ingested: '2026-05-19'
 engine: Flutter + Flame
-genre: 2D top-down zombie survival/base-defense
+genre: isometric 2.5D zombie survival/base-defense
 scope: one-week vertical slice
 tags:
 - night-siege
@@ -18,7 +18,7 @@ tags:
 
 # Night Siege Project Context
 
-This note preserves the initial project context for Night Siege and distills it into structured design memory. Night Siege is a small Flutter/Flame 2D top-down zombie survival and base-defense game, scoped as a one-week vertical slice. The primary delivery goal is a playable, atmospheric prototype centered on scavenging, barricading, and surviving increasingly desperate nights.
+This note preserves the initial project context for Night Siege and distills it into structured design memory. Night Siege is a small Flutter/Flame isometric 2.5D zombie survival and base-defense game, scoped as a one-week vertical slice. The primary delivery goal is a playable, atmospheric prototype centered on scavenging, barricading, and surviving increasingly desperate nights.
 
 ## Source Content
 
@@ -26,7 +26,7 @@ This note preserves the initial project context for Night Siege and distills it 
 
 ## Project Overview
 
-Night Siege is a small 2D top-down zombie survival/base-defense game built using Flutter and the Flame game engine.
+Night Siege is a small isometric 2.5D zombie survival/base-defense game built using Flutter and the Flame game engine.
 
 The game is intended to be developed as a one-week vertical slice project focused on delivering a playable and atmospheric prototype rather than a large-scale feature-complete game.
 
@@ -56,7 +56,8 @@ The tone should feel tense, desperate, and atmospheric.
 - Dart
 
 ## Target Style
-- 2D top-down
+- Isometric 2.5D / fake 3D
+- 2D world-space gameplay with projected rendering
 - Keyboard controls first
 - Placeholder graphics initially
 - Mobile support is optional/stretch goal
@@ -272,32 +273,42 @@ This system exists to capture the “finding people and building a group” fant
 ## Phase 2 — Safehouse And HUD
 - Safehouse
 - HUD
-- Restart-ready game state
+- Starter ammo and wood counters
+- Simple phase or wave label
+- Restart baseline for current run state
+- Full game-over behavior waits until zombies can damage the safehouse
 
-## Phase 3 — Zombies & Combat
+## Phase 3 — Isometric 2.5D Refactor
+- Add an isometric projection helper
+- Keep gameplay in 2D world coordinates
+- Render player and safehouse with simple fake-height geometry
+- Add depth sorting before future spatial components depend on draw order
+- Do not add zombies, combat, assets, true 3D, or new packages in this phase
+
+## Phase 4 — Zombies & Combat
 - Zombie spawning
 - Basic AI
 - Combat
 - Health systems
 
-## Phase 4 — Base Defense
+## Phase 5 — Base Defense
 - Barricades
 - Resource usage
 - Zombie damage/destruction
 
-## Phase 5 — Scavenging Loop
+## Phase 6 — Scavenging Loop
 - Day/night cycle
 - Loot pickups
 - Supply gathering
 
-## Phase 6 — Atmosphere & Polish
+## Phase 7 — Atmosphere & Polish
 - Audio
 - Lighting
 - Screen shake
 - UI polish
 - Game over/win screens
 
-## Phase 7 — Stretch Goals
+## Phase 8 — Stretch Goals
 - Survivor cards
 - Additional zombie types
 - Traps
@@ -334,7 +345,7 @@ The emotional fantasy is:
 “I barely survived another night.”
 
 ## Observations
-- [project] Night Siege is a small 2D top-down zombie survival/base-defense game built with Flutter, Flame, and Dart #night-siege
+- [project] Night Siege is a small isometric 2.5D zombie survival/base-defense game built with Flutter, Flame, and Dart #night-siege
 - [scope] Week one targets a playable vertical slice rather than a feature-complete game #mvp
 - [loop] Core loop is daytime scavenging, safehouse return, defense building or repair, nighttime survival, then repeat #gameplay
 - [tone] The intended tone is tense, desperate, claustrophobic, atmospheric, and resource-starved #atmosphere
@@ -342,6 +353,8 @@ The emotional fantasy is:
 - [constraint] Avoid overengineering, plugin bloat, large refactors, and premature abstraction during week one #scope
 - [phase] Phase 0 ends at a runnable Flutter and Flame shell with `GameWidget`, `NightSiegeGame`, and a plain rendered scene; it does not include player movement, zombies, HUD, safehouse, assets, or map tooling #delivery
 - [phase] Phase 1 introduces `PlayerComponent`, a visible placeholder player, WASD and arrow-key movement through `KeyboardEvents`, simple arena bounds, and focused movement tests #player
+- [phase] Phase 2 introduces the safehouse, starter ammo and wood counters, a simple phase or wave label, HUD feedback, and a restart baseline; full game-over behavior waits until zombies can damage the safehouse #safehouse
+- [phase] Phase 3 introduces isometric fake-3D presentation, world-to-screen projection, fake-height placeholders, and depth sorting while keeping gameplay in 2D world coordinates #isometric
 - [requirement] MVP requires player movement, safehouse health, zombie spawning and AI, combat, ammo, wood, barricades, damage systems, win/loss conditions, HUD, and restart flow #mvp
 - [stretch] Day/night cycle, loot pickups, repair, traps, small map, sound, screen shake, particles, and one survivor card are nice-to-have features #stretch
 - [non_goal] Week one excludes open world, multiplayer, complex crafting, large inventory, advanced AI, procedural generation, cinematics, fully simulated NPCs, and large content scope #scope

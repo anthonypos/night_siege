@@ -2,7 +2,7 @@
 
 This folder contains the developer-facing planning docs for the Night Siege one-week vertical slice.
 
-Night Siege is a small Flutter and Flame 2D top-down zombie survival/base-defense prototype. The project goal is a playable loop, not a commercial-scale game.
+Night Siege is a small Flutter and Flame isometric 2.5D zombie survival/base-defense prototype. The project goal is a playable loop, not a commercial-scale game.
 
 ## Source Of Truth
 
@@ -18,6 +18,8 @@ Night Siege is a small Flutter and Flame 2D top-down zombie survival/base-defens
 ## Project Rule
 
 Phase 0 ends at a runnable Flutter and Flame shell: `GameWidget`, `NightSiegeGame`, and a plain rendered scene. Phase 1 adds the visible moving player, keeps it inside the visible arena, and backs movement behavior with focused tests. Do not add safehouse, HUD, zombies, combat, assets, or map tooling before those checkpoints are complete.
+
+After Phase 1 is complete, Phase 2 may add only the safehouse, starter HUD state, and restart baseline. Phase 3 pivots the presentation to isometric fake 3D while preserving simple 2D world-space gameplay rules. Full game-over behavior waits until zombies can actually damage the safehouse.
 
 Protect the core gameplay loop:
 
