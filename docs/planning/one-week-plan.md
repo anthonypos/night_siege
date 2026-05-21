@@ -82,14 +82,17 @@ Main goal:
 Deliverables:
 
 - Isometric projection helper.
-- Player and safehouse use explicit world-space positions.
+- Player and safehouse use explicit `worldPosition` values.
+- Bounded `worldArenaSize` and fixed projection origin or viewport offset.
 - Player and safehouse render as readable fake-height placeholders.
-- Depth sorting for spatial components.
+- Named depth sorting rule for spatial components.
 - Movement, safehouse state, HUD, and restart tests still pass.
 
 Checkpoints:
 
 - The game still plays with the same WASD and arrow-key movement behavior.
+- Restart position, safehouse position, and representative arena corners project into the visible viewport.
+- Moving spatial components can update their relative render order when their `worldPosition` changes.
 - The HUD remains a Flutter overlay.
 - The safehouse and player read as objects with footprint and height.
 - No zombies, combat, barricades, loot, day/night timer, assets, or new packages are added yet.

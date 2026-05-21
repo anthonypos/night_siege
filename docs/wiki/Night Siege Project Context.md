@@ -280,9 +280,12 @@ This system exists to capture the “finding people and building a group” fant
 
 ## Phase 3 — Isometric 2.5D Refactor
 - Add an isometric projection helper
-- Keep gameplay in 2D world coordinates
+- Keep gameplay in 2D world coordinates through canonical `worldPosition` values
+- Define a bounded world arena and fixed projection origin or viewport offset
 - Render player and safehouse with simple fake-height geometry
-- Add depth sorting before future spatial components depend on draw order
+- Add a named depth sort key before future spatial components depend on draw order
+- Verify restart positions, safehouse placement, representative arena corners, and dynamic depth order with focused tests
+- Update README language after the isometric pivot lands
 - Do not add zombies, combat, assets, true 3D, or new packages in this phase
 
 ## Phase 4 — Zombies & Combat
@@ -354,7 +357,7 @@ The emotional fantasy is:
 - [phase] Phase 0 ends at a runnable Flutter and Flame shell with `GameWidget`, `NightSiegeGame`, and a plain rendered scene; it does not include player movement, zombies, HUD, safehouse, assets, or map tooling #delivery
 - [phase] Phase 1 introduces `PlayerComponent`, a visible placeholder player, WASD and arrow-key movement through `KeyboardEvents`, simple arena bounds, and focused movement tests #player
 - [phase] Phase 2 introduces the safehouse, starter ammo and wood counters, a simple phase or wave label, HUD feedback, and a restart baseline; full game-over behavior waits until zombies can damage the safehouse #safehouse
-- [phase] Phase 3 introduces isometric fake-3D presentation, world-to-screen projection, fake-height placeholders, and depth sorting while keeping gameplay in 2D world coordinates #isometric
+- [phase] Phase 3 introduces isometric fake-3D presentation, canonical `worldPosition` state, world-to-screen projection with a fixed origin or viewport offset, fake-height placeholders, and a named depth sort key while keeping gameplay in 2D world coordinates #isometric
 - [requirement] MVP requires player movement, safehouse health, zombie spawning and AI, combat, ammo, wood, barricades, damage systems, win/loss conditions, HUD, and restart flow #mvp
 - [stretch] Day/night cycle, loot pickups, repair, traps, small map, sound, screen shake, particles, and one survivor card are nice-to-have features #stretch
 - [non_goal] Week one excludes open world, multiplayer, complex crafting, large inventory, advanced AI, procedural generation, cinematics, fully simulated NPCs, and large content scope #scope

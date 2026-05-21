@@ -316,19 +316,21 @@ Priority:
 
 ## Phase 3 - Isometric 2.5D Refactor
 
-Phase 3 pivots the presentation from flat top-down to isometric fake 3D before zombies and combat are added. Keep gameplay state in 2D world coordinates and treat the isometric view as a rendering/projection layer.
+Phase 3 pivots the presentation from flat top-down to isometric fake 3D before zombies and combat are added. Keep gameplay state in 2D world coordinates and treat the isometric view as a rendering/projection layer. This phase must choose the canonical world-position field, projection origin, and depth-sort contract that future spatial components will reuse.
 
 ### P3-01 - Isometric Projection Helper
 
 Description:
 
-- Add a small helper that converts 2D world coordinates into isometric screen coordinates.
+- Add a small helper that converts 2D world coordinates into isometric screen coordinates using explicit projection constants and origin inputs.
 
 Acceptance criteria:
 
 - Projection math is isolated from gameplay rules.
+- Projection accepts a configurable tile size and screen origin or viewport offset.
 - World positions remain normal 2D vectors for movement, bounds, and future collision.
-- Projection is deterministic and covered by focused tests.
+- Projection is deterministic and covered by focused tests for cardinal world directions, height offset, origin handling, and representative arena corners.
+- Screen-to-world conversion is added only if Phase 3 needs it; if it is added, inverse behavior is covered by focused tests.
 - No new packages or true 3D engine are introduced.
 
 Suggested files/classes:
@@ -352,13 +354,18 @@ Priority:
 
 Description:
 
-- Convert player and safehouse placement to explicit world-space positions that are rendered through the isometric projection.
+- Convert player and safehouse placement to explicit `worldPosition` values that are rendered through the isometric projection.
 
 Acceptance criteria:
 
+- Player and safehouse use `worldPosition` as their canonical gameplay position.
+- Flame `position` or custom render offsets are derived from projection and are not used as gameplay state.
+- `NightSiegeGame` defines a bounded `worldArenaSize` separate from the current viewport size.
 - Player movement still uses `dt`, normalized diagonal movement, and arena bounds.
+- Player movement and clamping use world-space bounds.
 - Safehouse keeps current and max health from Phase 2.
 - `restartRun()` resets player world position, safehouse health, starter resources, and phase label.
+- The projection origin or viewport offset keeps the restart position, safehouse position, and representative arena corners visible in tested viewport sizes.
 - Existing Phase 1 and Phase 2 tests are updated without weakening behavior coverage.
 
 Suggested files/classes:
@@ -388,7 +395,9 @@ Description:
 Acceptance criteria:
 
 - Player and safehouse placeholders have readable footprint and height.
-- Components behind other components render first based on world position.
+- Components behind other components render first based on a named depth key, defaulting to `worldPosition.x + worldPosition.y` unless implementation tests show a better simple key.
+- Moving components update their Flame priority or central draw order when `worldPosition` changes.
+- Tests cover at least two spatial objects swapping relative depth order after their world positions change.
 - HUD remains a Flutter overlay and is not projected into world space.
 - Rendering stays geometric; no assets, map tooling, or new packages are added.
 
@@ -405,6 +414,36 @@ Dependencies:
 Estimated effort:
 
 - Medium.
+
+Priority:
+
+- Must-have.
+
+### P3-04 - Documentation Alignment
+
+Description:
+
+- Align project documentation with the completed isometric pivot and Phase 3 contracts.
+
+Acceptance criteria:
+
+- Root README describes Night Siege as an isometric 2.5D prototype rather than a flat top-down game after the pivot lands.
+- Phase 3 documentation names `worldPosition`, projection origin or viewport offset, and the chosen depth-sort key.
+- Documentation stays clear that Phase 3 adds no zombies, combat, barricades, loot, assets, map tooling, true 3D, or new packages.
+
+Suggested files/classes:
+
+- `README.md`
+- `docs/README.md`
+- `docs/wiki/Night Siege Project Context.md`
+
+Dependencies:
+
+- P3-03.
+
+Estimated effort:
+
+- Small.
 
 Priority:
 

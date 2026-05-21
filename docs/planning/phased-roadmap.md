@@ -190,16 +190,21 @@ User experience goal:
 
 Systems introduced:
 
+- Canonical world-space positions for spatial gameplay objects.
+- Bounded world arena plus a fixed projection origin or viewport offset.
 - World-to-screen projection helper.
 - Isometric placeholder rendering for the player and safehouse.
-- Depth sorting for world objects.
+- Named depth sort key for world objects.
 - World-space movement and bounds preserved behind the presentation layer.
 
 Technical risks:
 
 - Coupling gameplay rules to screen-space coordinates.
+- Letting Flame `position` quietly become both world state and projected screen state.
+- Choosing projection constants or origin values that push important arena points off-screen.
 - Breaking Phase 1 movement tests while changing the view.
 - Depth sorting bugs causing the player, safehouse, or future zombies to draw in the wrong order.
+- Updating draw order only at load time instead of when moving components change world position.
 
 Scope risks:
 
@@ -210,12 +215,17 @@ Scope risks:
 Acceptance criteria:
 
 - Player and safehouse still use deterministic 2D world positions for movement and state.
+- Spatial components expose a canonical `worldPosition`; projected screen coordinates are derived for rendering only.
+- The game defines a bounded `worldArenaSize` and a projection origin or viewport offset.
+- Tests prove the player restart position, safehouse position, and representative arena corners project into the visible viewport.
 - Rendering uses an isometric or fake-3D projection.
 - Player and safehouse placeholders have readable footprint and height.
-- Components render in depth order based on world position.
+- Components render in depth order based on a named world-position sort key.
+- Moving components can update their render order when their `worldPosition` changes.
 - HUD from Phase 2 remains a Flutter overlay and still displays safehouse health, ammo, wood, and phase label.
 - `restartRun()` still resets the same Phase 2 state.
 - Phase 1 movement tests and Phase 2 state/HUD tests continue to pass.
+- Root README language is aligned with the isometric 2.5D direction after the pivot.
 - No zombies, combat, barricades, loot, day/night timer, game-over overlay, victory overlay, assets, map tooling, or new packages are added in this phase.
 
 Estimated complexity:
@@ -224,12 +234,14 @@ Estimated complexity:
 
 Suggested implementation order:
 
-1. Add a small projection helper for world-to-screen and screen-to-world where needed.
-2. Keep player movement in world coordinates.
-3. Convert player and safehouse placement to explicit world positions.
-4. Update player and safehouse placeholder rendering for isometric fake height.
-5. Add depth sorting for spatial components.
-6. Update tests to assert gameplay state remains world-space and deterministic.
+1. Define `worldArenaSize` and the fixed projection origin or viewport offset.
+2. Add a small projection helper for world-to-screen, and add screen-to-world only if Phase 3 actually needs it.
+3. Convert player and safehouse placement to explicit `worldPosition` values.
+4. Keep player movement, restart, and bounds logic in world coordinates.
+5. Update player and safehouse placeholder rendering for isometric fake height.
+6. Add depth sorting for spatial components using the named world-position sort key.
+7. Update tests for projection visibility, movement, restart state, and dynamic depth ordering.
+8. Update README language once the isometric pivot lands.
 
 ## Phase 4 - Zombies And Combat
 

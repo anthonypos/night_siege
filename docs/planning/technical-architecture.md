@@ -92,18 +92,22 @@ Use 2D world coordinates for gameplay:
 
 Use an isolated projection helper to convert world coordinates into isometric screen coordinates for rendering. Do not make gameplay systems reason directly about projected screen coordinates.
 
+Phase 3 should introduce `worldPosition` as the canonical gameplay position for spatial components. Movement, bounds, targeting, collision, spawn positions, placement positions, and restart logic should read and write `worldPosition`. Flame `position` or any custom render offset should be treated as projected presentation state after the isometric pivot.
+
+Use a bounded `worldArenaSize` separate from the current viewport size. `NightSiegeGame` should define a fixed projection origin or viewport offset that keeps the current player restart position, safehouse position, and representative arena corners visible in target viewports. A fixed offset is enough for Phase 3; do not add camera tooling before the core loop needs it.
+
 Recommended projection shape:
 
 ```text
-screenX = (worldX - worldY) * tileWidth / 2
-screenY = (worldX + worldY) * tileHeight / 2 - heightOffset
+screenX = originX + (worldX - worldY) * tileWidth / 2
+screenY = originY + (worldX + worldY) * tileHeight / 2 - heightOffset
 ```
 
-The exact constants can be tuned, but they should live in one small helper rather than being scattered across components.
+The exact constants can be tuned, but they should live in one small helper rather than being scattered across components. Add screen-to-world conversion only when pointer placement or another Phase 3 behavior actually needs it.
 
 Fake height should be represented as rendering geometry, not physics. A safehouse can have a footprint and wall height, while collisions and health still use simple 2D world-space values.
 
-Depth sorting should draw lower/farther world objects first and higher/nearer objects later, typically using a sort key based on `worldPosition.y`, `worldPosition.x + worldPosition.y`, or another consistent world-depth value. Add this before zombies so every future component inherits the same visual rule.
+Depth sorting should draw lower/farther world objects first and higher/nearer objects later. Prefer a named sort key such as `worldDepth = worldPosition.x + worldPosition.y` unless implementation tests show a clearer simple rule. Update Flame priority or the central draw order whenever a moving component changes `worldPosition`, and cover depth-order swaps with focused tests. Add this before zombies so every future component inherits the same visual rule.
 
 Avoid:
 
