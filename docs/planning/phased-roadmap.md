@@ -264,6 +264,7 @@ Systems introduced:
 - `BulletComponent`.
 - Ammo spending.
 - Damage and death handling.
+- Game-owned zombie and bullet cleanup.
 - Failure state once safehouse health reaches zero.
 
 Technical risks:
@@ -286,12 +287,13 @@ Suggested implementation order:
 
 1. Add one zombie moving toward the safehouse.
 2. Add simple timed spawning from arena edges.
-3. Add shooting with a cooldown.
+3. Add shooting with a defined key, aim rule, and cooldown.
 4. Consume ammo per shot.
 5. Add bullet-zombie collision.
 6. Remove dead zombies and expired bullets.
-7. Add zombie damage to safehouse.
+7. Add zombie damage to safehouse using a fixed attack range and cadence.
 8. Trigger a restartable failure state when safehouse health reaches zero.
+9. Wire a game-over overlay with a restart action.
 
 ## Phase 5 - Barricades And Base Defense
 

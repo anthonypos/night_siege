@@ -520,7 +520,10 @@ Acceptance criteria:
 - Shooting consumes one ammo.
 - Shooting has a cooldown.
 - No shot fires when ammo is zero.
+- The fire input is explicit and does not conflict with movement controls.
+- The initial aim rule is explicit and testable, such as last movement direction, nearest zombie, or a fixed world-space direction.
 - Bullet travels in a readable world-space direction and renders clearly in the isometric view.
+- Ammo changes go through a game-owned method so the HUD refreshes after firing.
 
 Suggested files/classes:
 
@@ -551,7 +554,10 @@ Acceptance criteria:
 - Bullets damage zombies.
 - Zombies are removed when health reaches zero.
 - Zombies damage the safehouse when close enough.
+- Zombie safehouse attacks use a fixed world-space range, damage amount, and attack cadence so damage is not frame-rate dependent.
 - Dead or expired components are removed.
+- `NightSiegeGame` owns the active zombie and bullet collections or otherwise exposes deterministic counts for cleanup and restart tests.
+- Safehouse damage goes through a game-owned method so health clamping, game-over checks, and HUD refresh happen in one place.
 
 Suggested files/classes:
 
@@ -582,6 +588,8 @@ Acceptance criteria:
 
 - Safehouse reaching zero health triggers game over.
 - Game over stops zombie spawning, shooting, and damage updates.
+- The game-over overlay is registered in `GameWidget.overlayBuilderMap` and activated by `NightSiegeGame`.
+- The game-over overlay has a restart action that calls `restartRun()`.
 - Restart resets player, safehouse, resources, zombies, bullets, and the current attack or wave state.
 - Restart does not reference barricades or loot before those systems exist.
 

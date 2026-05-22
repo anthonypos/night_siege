@@ -168,12 +168,15 @@ Components should ask the game to perform meaningful state changes:
 - `spendWood(amount)`
 - `spendAmmo(amount)`
 - `damageSafehouse(amount)`
+- `fireBullet(direction)`
 - `placeBarricade(position)`
 - `spawnZombie(position)`
 - `endRun()`
 - `restartRun()`
 
-This keeps gameplay rules visible and avoids hidden side effects.
+This keeps gameplay rules visible and avoids hidden side effects. Any mutation that changes HUD-visible state should notify the HUD through the existing game-owned revision or the current project equivalent.
+
+Starting in Phase 4, `NightSiegeGame` should also own the lifecycle of active combat components. Keep zombies and bullets in typed collections, or provide an equally deterministic child-query helper, so collision, cleanup, game-over stopping, and restart resets can be tested without relying on incidental render tree state.
 
 Phase 2 can use a simple phase or wave label for HUD text before the day/night model exists. Phase 3 should keep that state intact while changing the world presentation. Add `GamePhase` when Phase 6 needs branchable phases and timer-driven transitions. `Resources` may be introduced in Phase 2 as starter ammo and wood counters; Phase 5 turns wood into a spendable defense-building resource.
 
@@ -189,7 +192,7 @@ Week-one overlays:
 
 Do not build a complex app router for week one.
 
-In Phase 2, `HudOverlay` should show safehouse health, starter ammo, starter wood, and a simple phase or wave label. Add `GameOverOverlay` after a real loss condition exists, starting with zombies damaging the safehouse.
+In Phase 2, `HudOverlay` should show safehouse health, starter ammo, starter wood, and a simple phase or wave label. Add `GameOverOverlay` after a real loss condition exists, starting with zombies damaging the safehouse. Register the game-over overlay in `GameWidget.overlayBuilderMap`, let `NightSiegeGame` activate it when the run ends, and route its restart action back through `restartRun()`.
 
 ## Asset Strategy
 
